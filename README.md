@@ -11,26 +11,6 @@ This project develops machine learning models to predict Hass avocado prices acr
 
 > "Everyone loves avocados—it's only a shame that the prices vary so much each season. Wouldn't it be great to predict the price of avocados in the upcoming months?"
 
-## Business Value
-
-Accurate avocado price prediction delivers significant value to multiple stakeholders:
-
-- **Retailers**: Optimize pricing strategies and inventory management
-- **Distributors**: Better plan operations and logistics
-- **Farmers**: Make informed decisions about harvesting and market timing
-- **Consumers**: Benefit from more stable pricing through improved market efficiency
-
-## CRISP-DM Methodology
-
-This project follows the Cross-Industry Standard Process for Data Mining (CRISP-DM) methodology:
-
-1. **Business Understanding**: Clearly defined objectives, success criteria, and constraints
-2. **Data Understanding**: Comprehensive exploration of avocado pricing datasets and weather data
-3. **Data Preparation**: Rigorous cleaning, feature engineering, and integration of multiple data sources
-4. **Modeling**: Implementation of time series and machine learning approaches
-5. **Evaluation**: Thorough assessment against business and technical success criteria
-6. **Deployment**: Production of actionable forecasts and recommendations
-
 ## Data Sources
 
 ### Avocado Price Data
@@ -41,9 +21,7 @@ This project follows the Cross-Industry Standard Process for Data Mining (CRISP-
 
 ### Weather Data
 - Historical weather data retrieved via Meteostat API for corresponding US regions
-- Integrated datasets:
-  - `data/raw/avocado2015to2022withweather.csv`: Training dataset with weather features
-  - `data/raw/avocadoafter2023withweather.csv`: Validation dataset for 2023+
+- Integrated datasets with weather features for both training and validation
 
 ## Technical Approach
 
@@ -56,77 +34,62 @@ This project follows the Cross-Industry Standard Process for Data Mining (CRISP-
 - **Volume Metrics**: Total volume, bags by size category
 
 ### Machine Learning Models
-- **Time Series Models**
-  - ARIMA (AutoRegressive Integrated Moving Average)
-  - SARIMA (Seasonal ARIMA)
-  - Prophet (Facebook's forecasting tool)
 - **Traditional ML Models**
+  - Linear Regression with regularization
   - Random Forest Regressor
   - Gradient Boosting Regressor
-  - Linear Regression with regularization
-- **Ensemble Methods**
-  - Stacking of multiple model predictions
-  - Weighted averaging of forecasts
+  - XGBoost
+- **Time Series Exploration**
+  - Trend and seasonality analysis
+  - Moving averages and decomposition
 
 ### Evaluation Metrics
 - **R²**: Coefficient of determination (target: >0.7 for LR, >0.9 for RF)
 - **MAE**: Mean Absolute Error (target: <0.1)
 - **RMSE**: Root Mean Squared Error (target: <0.15)
-- **MAPE**: Mean Absolute Percentage Error
-- **Statistical Tests**: Durbin-Watson, ADF for time series
 
 ## Key Findings
 
-- Random Forest model achieved best performance with R² of 0.93, MAE of 0.07, and RMSE of 0.10
-- Most influential price predictors:
+- **Model Performance**:
+  - Random Forest achieved best performance with R² of 0.93, MAE of 0.07, and RMSE of 0.11
+  - Linear Regression underperformed (R² of 0.45), indicating the non-linear nature of avocado pricing
+  - Weather data integration maintained but did not improve model performance
+
+- **Most influential price predictors**:
   - Avocado type (organic vs. conventional)
   - Geographic region
-  - Seasonal factors (particularly Q2 and Q4)
-  - Weather conditions (especially temperature extremes)
-- Pronounced regional price variations with highest volatility in West and Northeast regions
-- Organic avocados show greater price stability but consistently higher pricing
+  - Seasonal factors
+  - Volume metrics
+
+- **Market Insights**:
+  - Pronounced regional price variations with different volatility patterns
+  - Organic avocados show greater price stability but consistently higher pricing
+  - Clear seasonal patterns affect pricing throughout the year
 
 ## Project Structure
 
 ```
-├── LICENSE                          <- Open-source license
-├── Makefile                         <- Makefile with convenience commands
-├── README.md                        <- This file; project documentation
+├── README.md                        <- Project documentation
 ├── data                             <- All project data
 │   ├── external                     <- Data from third party sources
 │   ├── interim                      <- Intermediate transformed data
 │   ├── processed                    <- Final, canonical data for modeling
 │   └── raw                          <- Original, immutable data
 │
-├── docs                             <- Documentation generated with mkdocs
-│
-├── models                           <- Trained models, predictions, summaries
-│   └── trained                      <- Serialized trained models
-│
 ├── notebooks                        <- Jupyter notebooks following CRISP-DM phases
+│   ├── 0-Overview.ipynb             <- Project overview and organization
 │   ├── 1_Business_Understanding.ipynb
 │   ├── 2_Data_Understanding.ipynb
 │   ├── 3_Data_Preparation.ipynb
 │   ├── 4_Modeling.ipynb
-│   ├── 5_Evaluation.ipynb
-│   ├── 6_Deployment.ipynb
-│   └── avocado_price_forecasting.ipynb
+│   └── 5_Evaluation.ipynb
 │
-├── reports                          <- Generated analysis reports
-│   └── figures                      <- Generated graphics and figures
+├── src                              <- Source code for data collection and processing
+│   └── getweatherdata.py            <- Weather data collection utilities
 │
 ├── requirements.txt                 <- Project dependencies
 │
-└── avocado_price_forecasting_individual <- Source code package
-    ├── __init__.py                  <- Makes package importable
-    ├── config.py                    <- Configuration parameters
-    ├── dataset.py                   <- Data downloading and loading utilities
-    ├── features.py                  <- Feature engineering functions
-    ├── modeling                     <- Model training and prediction code
-    │   ├── __init__.py
-    │   ├── predict.py               <- Prediction functionality
-    │   └── train.py                 <- Model training functionality
-    └── plots.py                     <- Visualization utilities
+└── .env                             <- Environment variables and configuration
 ```
 
 ## Setup Instructions
@@ -154,18 +117,25 @@ jupyter notebook
 
 - **Data Manipulation**: pandas, numpy
 - **Visualization**: matplotlib, seaborn, plotly
-- **Machine Learning**: scikit-learn, xgboost, lightgbm
-- **Time Series**: statsmodels, prophet
+- **Machine Learning**: scikit-learn, xgboost
+- **Time Series**: statsmodels
 - **Weather Data**: meteostat
 - **Utilities**: jupyter, tqdm
 
-## Future Work
+## Limitations and Future Work
 
-- Incorporate additional economic indicators (fuel prices, labor costs, inflation)
-- Develop region-specific specialized models
-- Create an interactive dashboard for real-time pricing forecast updates
-- Extend model to predict prices by avocado size categories
-- Explore causal inference methods for deeper relationship understanding
+- **Current Limitations**:
+  - Limited to Hass avocados only
+  - Weekly granularity (cannot capture daily fluctuations)
+  - Limited ability to account for market disruptions
+  - Regional aggregation may mask micromarket conditions
+
+- **Future Improvements**:
+  - Incorporate more granular weather data
+  - Add macroeconomic indicators (inflation, fuel prices, exchange rates)
+  - Develop region-specific models for unique market dynamics
+  - Experiment with deep learning for capturing complex patterns
+  - Implement automated model updating with new data
 
 ## License
 
